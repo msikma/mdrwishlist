@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+const fs = require('fs')
+const path = require('path')
+const ArgumentParser = require('argparse').ArgumentParser
+const package = require('../package.json')
+
+const parser = new ArgumentParser({
+  version: package.version,
+  addHelp: true,
+  description: package.description
+})
+parser.addArgument('action', { help: 'Which script to run.', defaultValue: '', choices: ['shopping-list'] })
+parser.addArgument('--cookies', { help: 'Override standard location of the cookies.txt file.' })
+parser.addArgument('--raw-data', { help: 'Instead of displaying a formatted list, display raw data.', action: 'storeTrue', dest: 'rawData' })
+
+// Reminder: 'cookies' is null or a string. 'action' is a string. 'rawData' is a boolean.
+const parsed = parser.parseArgs()
+const args = { ...parsed }
+
+// Default the cookie file to the root directory's 'cookies.txt'.
+// If the cookies argument was passed on the command line, make that leading.
+process.env.COOKIE_FILE = args.cookies || process.env.MDRWISHLIST_COOKIE_FILE || path.join(process.env.HOME, '.mdrwishlist', 'cookies.txt')
+
+// Fire up the main application.
+require('babel-polyfill')
+
+/* uncomment for testing from ./src
+*/
+require('babel-register')({
+  "presets": ["env"],
+  "plugins": ["transform-class-properties", "transform-object-rest-spread"]
+})
+require('../src/index').run(args)
+
+//require('../dist/index').run(args)
