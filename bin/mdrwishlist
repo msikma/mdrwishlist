@@ -14,12 +14,10 @@ parser.addArgument('--cookies', { help: 'Override standard location of the cooki
 parser.addArgument('--raw-data', { help: 'Instead of displaying a formatted list, display raw data.', action: 'storeTrue', dest: 'rawData' })
 
 // Reminder: 'cookies' is null or a string. 'action' is a string. 'rawData' is a boolean.
+// Default cookies to the default path.
 const parsed = parser.parseArgs()
-const args = { ...parsed }
-
-// Default the cookie file to the root directory's 'cookies.txt'.
-// If the cookies argument was passed on the command line, make that leading.
-process.env.COOKIE_FILE = args.cookies || process.env.MDRWISHLIST_COOKIE_FILE || path.join(process.env.HOME, '.mdrwishlist', 'cookies.txt')
+const stdCookies = path.join(process.env.HOME, '.config', 'mdrwishlist', 'cookies.txt')
+const args = { ...parsed, cookies: parsed.cookies || stdCookies }
 
 // Fire up the main application.
 require('babel-polyfill')
